@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>한글 연습장</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  :root {
+    --ocean: #118ab2;
+    --coral: #ff8c6b;
+    --sun:   #ffd166;
+    --leaf:  #06d6a0;
+    --ink:   #2d3436;
+    --sky:   #e8f4fd;
+    --border:#74c0fc;
+    --grid:  #b2dff7;
+    --guide: #ffb3c6;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg,#e8f4fd 0%,#d0f0e8 60%,#fff9e6 100%);
+    min-height: 100vh;
+  }
+
+  /* ═══════════════════
+     모바일 UI
+  ═══════════════════ */
+  .ui-wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 22px 16px 14px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem,6.5vw,2.1rem);
+    font-weight: 900;
+    color: var(--ocean);
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #636e72;
+    font-size: clamp(0.82rem,3.2vw,0.95rem);
+    margin-bottom: 18px;
+  }
+
+  .panel {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 5px 22px rgba(17,138,178,0.1);
+    border: 2.5px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .panel-title {
+    font-size: clamp(0.82rem,3vw,0.92rem);
+    font-weight: 700;
+    color: var(--ocean);
+    margin-bottom: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 88px;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 9px 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(0.95rem,3.8vw,1.05rem);
+    color: var(--ink);
+    background: var(--sky);
+    resize: vertical;
+    outline: none;
+    line-height: 1.8;
+  }
+  textarea:focus { border-color: var(--coral); background: white; }
+
+  .opt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .opt-item {
+    background: var(--sky);
+    border-radius: 10px;
+    padding: 9px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .opt-item label {
+    font-size: clamp(0.72rem,2.6vw,0.82rem);
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .opt-item select,
+  .opt-item input[type=number] {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(0.82rem,3vw,0.92rem);
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    padding: 4px 7px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+  }
+
+  .fade-sub {
+    grid-column: 1 / -1;
+    background: #fff8f6;
+    border: 1.5px dashed var(--coral);
+    border-radius: 10px;
+    padding: 9px 11px;
+    display: none;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .fade-sub.show { display: flex; }
+  .fade-sub label {
+    font-size: clamp(0.72rem,2.6vw,0.82rem);
+    font-weight: 700;
+    color: var(--coral);
+    white-space: nowrap;
+  }
+  .fade-sub input[type=number] {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(0.82rem,3vw,0.92rem);
+    border: 2px solid var(--coral);
+    border-radius: 7px;
+    padding: 4px 7px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    width: 60px;
+  }
+  .fade-sub input[type=range] { flex:1; min-width:80px; accent-color:var(--coral); }
+  .fade-val { font-size:0.8rem; font-weight:700; color:var(--coral); min-width:32px; }
+
+  .btn-row { display:flex; gap:8px; margin-top:2px; }
+  .btn {
+    flex:1; padding:12px 0; border:none; border-radius:36px;
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:clamp(0.9rem,3.5vw,1rem);
+    font-weight:700; cursor:pointer; transition:transform 0.12s;
+  }
+  .btn:active { transform:scale(0.96); }
+  .btn-make  { background:linear-gradient(135deg,var(--coral),#ff6b9d); color:white; }
+  .btn-clear { background:linear-gradient(135deg,var(--sun),#fdcb6e);   color:var(--ink); }
+  .btn-print { background:linear-gradient(135deg,var(--leaf),#00b894);  color:white; }
+
+  .print-bar { max-width:560px; margin:0 auto; padding:0 16px 12px; display:none; }
+  .print-bar.show { display:block; }
+  .print-bar .btn { width:100%; display:block; }
+
+  /* ═══════════════════
+     A4 미리보기
+  ═══════════════════ */
+  .preview-scroll {
+    overflow-x: auto;
+    padding: 0 16px 48px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── A4 시트 ──
+     핵심: width 고정 + overflow hidden 제거
+     칸들이 넘치지 않도록 내부에서만 처리
+  */
+  .sheet {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    box-shadow: 0 8px 36px rgba(0,0,0,0.13);
+    border-radius: 4px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .sheet::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle,#dae8f5 1px,transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* 헤더: 타이틀 좌 / 이름확인 우 */
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2.5px dashed var(--sun);
+    padding-bottom: 3mm;
+    margin-bottom: 4mm;
+    position: relative;
+    z-index: 1;
+  }
+  .sheet-title { font-size:12pt; font-weight:900; color:var(--ocean); white-space:nowrap; }
+
+  .sheet-header-right {
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+    flex-shrink: 0;
+  }
+  .name-field {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    font-size: 8pt;
+    color: #666;
+    white-space: nowrap;
+  }
+  .name-field .uline {
+    display: inline-block;
+    width: 20mm;
+    border-bottom: 1.2px solid #bbb;
+  }
+  .sheet-page {
+    font-size: 7.5pt; color:#aaa;
+    background:var(--sky);
+    border:1.5px solid var(--border);
+    border-radius:5px; padding:2px 8px;
+    white-space: nowrap;
+  }
+
+  /* ── 문장 섹션 ── */
+  .notebook-section { position:relative; z-index:1; margin-bottom:2mm; }
+  .sentence-label   { font-size:7pt; color:var(--coral); font-weight:700; margin-bottom:0.8mm; }
+
+  /* 핵심: 행 컨테이너는 width 180mm 고정 + overflow hidden */
+  .char-row {
+    display: flex;
+    flex-wrap: nowrap;
+    /* 180mm = 210mm - 15mm*2 */
+    max-width: 180mm;
+    overflow: hidden;
+  }
+
+  /* 칸 크기는 JS에서 --cw, --cf 주입 */
+  .original-cell {
+    width: var(--cw);
+    height: var(--cw);
+    min-width: var(--cw);
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--cf);
+    font-weight: 900;
+    color: var(--ocean);
+    background: #eef6ff;
+    position: relative;
+    overflow: hidden;
+    line-height: 1;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .original-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:#bcd9f5; }
+  .original-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:#bcd9f5; }
+
+  .practice-cell {
+    width: var(--cw);
+    height: var(--cw);
+    min-width: var(--cw);
+    flex-shrink: 0;
+    border: 1.8px solid var(--grid);
+    border-radius: 2px;
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .practice-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:var(--guide); opacity:.4; }
+  .practice-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:var(--guide); opacity:.4; }
+  .diag {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(to bottom right,transparent calc(50% - .5px),#ffe0ec 50%,transparent calc(50% + .5px)),
+      linear-gradient(to bottom left, transparent calc(50% - .5px),#ffe0ec 50%,transparent calc(50% + .5px));
+    opacity:.18;
+  }
+
+  .fade-cell {
+    width: var(--cw);
+    height: var(--cw);
+    min-width: var(--cw);
+    flex-shrink: 0;
+    border: 1.8px solid var(--grid);
+    border-radius: 2px;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--cf);
+    font-weight: 900;
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1;
+    color: var(--ocean);
+  }
+  .fade-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:var(--guide); opacity:.4; }
+  .fade-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:var(--guide); opacity:.4; }
+
+  .space-cell { width:calc(var(--cw) * 0.35); min-width:calc(var(--cw) * 0.35); flex-shrink:0; }
+
+  .practice-rows { display:flex; flex-direction:column; }
+  .row-divider   { height:1.5mm; margin:1.5mm 0; border-bottom:1.2px dotted #ddd; }
+
+  /* ═══════════════════
+     인쇄
+  ═══════════════════ */
+  @media print {
+    @page { size:A4; margin:0; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body { background:none !important; }
+    .ui-wrap, .print-bar { display:none !important; }
+    .preview-scroll { padding:0; overflow:visible; }
+    .sheet {
+      box-shadow:none; border-radius:0; margin:0;
+      width:210mm; min-height:297mm;
+      page-break-after:always;
+      padding:15mm;
+    }
+    .sheet::before { opacity:.15; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ui-wrap">
+  <h1>한글 연습장</h1>
+  <p class="subtitle">문장을 입력하고 만들기를 눌러요 ✏️</p>
+
+  <div class="panel">
+    <div class="panel-title">연습할 문장 (줄바꿈으로 문장 구분)</div>
+    <textarea id="inputText"
+      placeholder="예) 나는 학교에 갑니다.&#10;오늘 날씨가 맑아요.&#10;사랑해요 엄마!"></textarea>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">출력 설정</div>
+    <div class="opt-grid">
+
+      <div class="opt-item">
+        <label>칸 수 (4~12)</label>
+        <input type="number" id="colCount" value="8" min="4" max="12">
+      </div>
+
+      <div class="opt-item">
+        <label>이름 칸</label>
+        <select id="showName">
+          <option value="yes">보이기</option>
+          <option value="no">숨기기</option>
+        </select>
+      </div>
+
+      <div class="opt-item">
+        <label>따라쓰기 줄 수</label>
+        <input type="number" id="practiceRows" value="2" min="0" max="5">
+      </div>
+
+      <div class="opt-item">
+        <label>흐리게 따라쓰기</label>
+        <select id="fadeMode" onchange="toggleFadeSub()">
+          <option value="0">사용 안 함</option>
+          <option value="1">사용</option>
+        </select>
+      </div>
+
+      <div class="fade-sub" id="fadeSub">
+        <label>줄 수</label>
+        <input type="number" id="fadeRows" value="1" min="1" max="5">
+        <label style="margin-left:6px">진하기</label>
+        <input type="range" id="fadeOpacity" min="5" max="40" value="18"
+          oninput="document.getElementById('fadeVal').textContent=this.value+'%'">
+        <span class="fade-val" id="fadeVal">18%</span>
+      </div>
+
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-clear" onclick="clearAll()">지우기</button>
+      <button class="btn btn-make"  onclick="generate()">만들기</button>
+    </div>
+  </div>
+</div>
+
+<div class="print-bar" id="printBar">
+  <button class="btn btn-print" onclick="window.print()">🖨 A4 인쇄하기</button>
+</div>
+
+<div class="preview-scroll">
+  <div id="sheetContainer"></div>
+</div>
+
+<script>
+  const ORDINALS = ['첫번째','두번째','세번째','네번째','다섯번째',
+                    '여섯번째','일곱번째','여덟번째','아홉번째','열번째',
+                    '열한번째','열두번째','열세번째','열네번째','열다섯번째'];
+  function ordinal(n){ return ORDINALS[n] || (n+1)+'번째'; }
+
+  function toggleFadeSub(){
+    const v = document.getElementById('fadeMode').value;
+    document.getElementById('fadeSub').classList.toggle('show', v==='1');
+  }
+
+  function clearAll(){
+    document.getElementById('inputText').value = '';
+    document.getElementById('sheetContainer').innerHTML = '';
+    document.getElementById('printBar').classList.remove('show');
+  }
+
+  function generate(){
+    const raw = document.getElementById('inputText').value.trim();
+    if(!raw){ alert('문장을 입력해 주세요!'); return; }
+
+    const cols        = Math.min(12, Math.max(4, parseInt(document.getElementById('colCount').value)||8));
+    const showName    = document.getElementById('showName').value === 'yes';
+    const practiceN   = Math.max(0, parseInt(document.getElementById('practiceRows').value)||0);
+    const fadeOn      = document.getElementById('fadeMode').value === '1';
+    const fadeN       = fadeOn ? Math.max(1, parseInt(document.getElementById('fadeRows').value)||1) : 0;
+    const fadeOpacity = parseInt(document.getElementById('fadeOpacity').value)||18;
+
+    const sentences = raw.split(/\n/).map(s=>s.trim()).filter(s=>s.length>0);
+
+    // 칸수 초과 문장 체크 (공백 제외 글자 수 기준)
+    const overList = sentences
+      .map((s, i) => ({ idx: i+1, len: Array.from(s).filter(c=>c!==' ').length, text: s }))
+      .filter(s => s.len > cols);
+
+    if(overList.length > 0){
+      const msg = overList.map(s =>
+        `• ${ordinal(s.idx-1)} 문장: ${s.len}글자 (최대 ${cols}칸)`
+      ).join('\n');
+      alert(`⚠️ 칸 수(${cols}칸)를 초과한 문장이 있어요!\n\n${msg}\n\n칸 수를 늘리거나 문장을 줄여주세요.`);
+      return;
+    }
+
+    const container = document.getElementById('sheetContainer');
+    container.innerHTML = '';
+
+    // 칸 크기: 180mm / cols (소수점 4자리)
+    const cellMm = parseFloat((180 / cols).toFixed(4));
+    const fontMm = parseFloat((cellMm * 0.78).toFixed(4));
+
+    // 페이지당 최대 문장 수 계산
+    // 사용 가능 높이: 297 - 30(마진) - 14(헤더) = 253mm
+    const usableH  = 253;
+    // 섹션 높이: 원본1 + 따라쓰기N + 흐리게N + 라벨2.5mm + 구분3mm
+    const sectionH = cellMm * (1 + practiceN + fadeN) + 2.5 + 3;
+    const maxPer   = Math.max(1, Math.floor(usableH / sectionH));
+
+    const pages = [];
+    for(let i=0; i<sentences.length; i+=maxPer)
+      pages.push(sentences.slice(i, i+maxPer));
+
+    pages.forEach((ps, pIdx)=>{
+      container.appendChild(
+        buildSheet(ps, cols, cellMm, fontMm, practiceN, fadeN, fadeOpacity,
+                   showName, pIdx+1, pages.length, pIdx*maxPer)
+      );
+    });
+
+    document.getElementById('printBar').classList.add('show');
+    container.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function buildSheet(sentences, cols, cellMm, fontMm, practiceN, fadeN, fadeOpacity,
+                      showName, pageNum, total, startIdx){
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+    sheet.style.setProperty('--cw', cellMm+'mm');
+    sheet.style.setProperty('--cf', fontMm+'mm');
+
+    // 헤더 (타이틀 + 이름/확인 + 페이지)
+    const hdr = document.createElement('div');
+    hdr.className = 'sheet-header';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'sheet-title';
+    titleEl.textContent = '한글 연습장';
+    hdr.appendChild(titleEl);
+
+    const rightEl = document.createElement('div');
+    rightEl.className = 'sheet-header-right';
+
+    if(showName){
+      rightEl.innerHTML =
+        '<div class="name-field">이름 <span class="uline"></span></div>'
+        + '<div class="name-field">확인 <span class="uline"></span></div>';
+    }
+    if(total > 1){
+      const pg = document.createElement('div');
+      pg.className = 'sheet-page';
+      pg.textContent = pageNum + ' / ' + total;
+      rightEl.appendChild(pg);
+    }
+    hdr.appendChild(rightEl);
+    sheet.appendChild(hdr);
+
+    // 문장 섹션
+    sentences.forEach((sentence, sIdx)=>{
+      const chars   = Array.from(sentence);
+      const section = document.createElement('div');
+      section.className = 'notebook-section';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'sentence-label';
+      lbl.textContent = ordinal(startIdx + sIdx) + ' 문장';
+      section.appendChild(lbl);
+
+      // 순서: 원본 → 흐리게(있으면 2번째) → 따라쓰기
+      section.appendChild(buildRow(chars, 'original', null));
+
+      const pw = document.createElement('div');
+      pw.className = 'practice-rows';
+
+      // 흐리게를 먼저(두번째 줄)
+      for(let r=0; r<fadeN; r++)
+        pw.appendChild(buildRow(chars, 'fade', fadeOpacity));
+
+      // 그 다음 빈 따라쓰기
+      for(let r=0; r<practiceN; r++)
+        pw.appendChild(buildRow(chars, 'practice', null));
+
+      section.appendChild(pw);
+
+      const divider = document.createElement('div');
+      divider.className = 'row-divider';
+      section.appendChild(divider);
+
+      sheet.appendChild(section);
+    });
+
+    return sheet;
+  }
+
+  function buildRow(chars, type, fadeOpacity){
+    const row = document.createElement('div');
+    row.className = 'char-row';
+
+    chars.forEach(ch=>{
+      const cell = document.createElement('div');
+      if(ch === ' '){
+        cell.className = 'space-cell';
+      } else if(type === 'original'){
+        cell.className = 'original-cell';
+        cell.textContent = ch;
+      } else if(type === 'practice'){
+        cell.className = 'practice-cell';
+        const d = document.createElement('div');
+        d.className = 'diag';
+        cell.appendChild(d);
+      } else if(type === 'fade'){
+        cell.className = 'fade-cell';
+        cell.textContent = ch;
+        cell.style.opacity = (fadeOpacity / 100).toFixed(2);
+        const d = document.createElement('div');
+        d.className = 'diag';
+        cell.appendChild(d);
+      }
+      row.appendChild(cell);
+    });
+
+    return row;
+  }
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('inputText').value =
+      '나는 학교에 갑니다.\n오늘 날씨가 참 맑아요.\n사랑해요 엄마 아빠!';
+    generate();
+  });
+</script>
+</body>
+</html>
