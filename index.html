@@ -3,584 +3,761 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>한글 연습장</title>
+<title>성경 필사 연습장</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+  :root { --gold:#b8860b; --gold2:#d4a017; --brown:#5c3d1e; --border:#d4a017; --grid:#e8d5a3; --guide:#f0c8a0; --ink:#2c1810; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans KR',sans-serif; background: linear-gradient(160deg, #74b8d8 0%, #a8d4e8 35%, #d0eaf5 65%, #e8f4fa 100%); min-height:100vh; }
+
+  .ui-wrap { max-width:560px; margin:0 auto; padding:28px 16px 16px; }
+  .app-title { text-align:center; margin-bottom:22px; }
+  .app-title .cross { font-size:2rem; margin-bottom:4px; }
+  @media (max-width: 600px) { .app-title .cross { display:none; } }
+  .app-title h1 { font-size:clamp(1.6rem,6.5vw,2.1rem); font-weight:900; color:#1a3a5c; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(255,255,255,0.4); }
+  .app-title p { color:#3a6080; font-size:clamp(0.8rem,3vw,0.9rem); margin-top:4px; }
 
   :root {
-    --ocean: #118ab2;
-    --coral: #ff8c6b;
-    --sun:   #ffd166;
-    --leaf:  #06d6a0;
-    --ink:   #2d3436;
-    --sky:   #e8f4fd;
-    --border:#74c0fc;
-    --grid:  #b2dff7;
-    --guide: #ffb3c6;
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: linear-gradient(135deg,#e8f4fd 0%,#d0f0e8 60%,#fff9e6 100%);
-    min-height: 100vh;
-  }
-
-  /* ═══════════════════
-     모바일 UI
-  ═══════════════════ */
-  .ui-wrap {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 22px 16px 14px;
-  }
-
-  h1 {
-    font-size: clamp(1.6rem,6.5vw,2.1rem);
-    font-weight: 900;
-    color: var(--ocean);
-    text-align: center;
-    margin-bottom: 3px;
-  }
-  .subtitle {
-    text-align: center;
-    color: #636e72;
-    font-size: clamp(0.82rem,3.2vw,0.95rem);
-    margin-bottom: 18px;
+    --gold:  #b8860b; --gold2: #d4a017; --brown: #5c3d1e;
+    --border:#d4a017; --grid: #e8d5a3; --guide: #f0c8a0; --ink: #2c1810;
+    /* 새 디자인 시스템 컬러 */
+    --primary:   #5b5bd6;
+    --primary-h: #4747c2;
+    --primary-p: #2f2fa8;
+    --primary-d: #c7c7f5;
+    --stroke:    #ddddf5;
+    --surface:   #f5f5ff;
+    --text-ui:   #1a1a3e;
+    --text-sub:  #6b6b99;
+    --radius-btn: 10px;
   }
 
   .panel {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 5px 22px rgba(17,138,178,0.1);
-    border: 2.5px solid var(--border);
+    background: rgba(255,255,255,0.97);
+    border-radius: 16px; padding: 16px;
+    box-shadow: 0 2px 12px rgba(91,91,214,0.10);
+    border: 1.5px solid var(--stroke);
     margin-bottom: 12px;
   }
-  .panel-title {
-    font-size: clamp(0.82rem,3vw,0.92rem);
-    font-weight: 700;
-    color: var(--ocean);
-    margin-bottom: 8px;
-  }
+  .panel-title { font-size:clamp(0.82rem,3vw,0.92rem); font-weight:700; color:var(--text-ui); margin-bottom:10px; }
 
-  textarea {
-    width: 100%;
-    height: 88px;
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 9px 13px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: clamp(0.95rem,3.8vw,1.05rem);
-    color: var(--ink);
-    background: var(--sky);
-    resize: vertical;
-    outline: none;
-    line-height: 1.8;
+  .sel-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .sel-wrap { display:flex; flex-direction:column; gap:3px; }
+  .sel-label { font-size:0.72rem; font-weight:700; color:var(--text-sub); }
+  .sel-wrap select, .verse-input {
+    font-family:'Noto Sans KR',sans-serif; font-size:clamp(0.82rem,3vw,0.9rem);
+    border: 1.5px solid var(--stroke); border-radius: var(--radius-btn); padding:8px 7px;
+    background: white; color: var(--text-ui); outline:none; width:100%; font-weight:700;
+    transition: border-color 0.15s;
   }
-  textarea:focus { border-color: var(--coral); background: white; }
+  .sel-wrap select:focus, .verse-input:focus { border-color: var(--primary); }
 
-  .opt-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .opt-item {
-    background: var(--sky);
-    border-radius: 10px;
-    padding: 9px 11px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .opt-item label {
-    font-size: clamp(0.72rem,2.6vw,0.82rem);
-    font-weight: 700;
-    color: var(--ink);
-  }
-  .opt-item select,
-  .opt-item input[type=number] {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: clamp(0.82rem,3vw,0.92rem);
-    border: 2px solid var(--border);
-    border-radius: 7px;
-    padding: 4px 7px;
-    background: white;
-    color: var(--ink);
-    outline: none;
-    width: 100%;
-  }
+  .verse-row { display:grid; grid-template-columns:1fr auto 1fr; gap:6px; align-items:end; margin-bottom:8px; }
+  .verse-row .dash { color:var(--text-sub); font-weight:700; text-align:center; padding-bottom:8px; }
 
-  .fade-sub {
-    grid-column: 1 / -1;
-    background: #fff8f6;
-    border: 1.5px dashed var(--coral);
-    border-radius: 10px;
-    padding: 9px 11px;
-    display: none;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .fade-sub.show { display: flex; }
-  .fade-sub label {
-    font-size: clamp(0.72rem,2.6vw,0.82rem);
-    font-weight: 700;
-    color: var(--coral);
-    white-space: nowrap;
-  }
-  .fade-sub input[type=number] {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: clamp(0.82rem,3vw,0.92rem);
-    border: 2px solid var(--coral);
-    border-radius: 7px;
-    padding: 4px 7px;
-    background: white;
-    color: var(--ink);
-    outline: none;
-    width: 60px;
-  }
-  .fade-sub input[type=range] { flex:1; min-width:80px; accent-color:var(--coral); }
-  .fade-val { font-size:0.8rem; font-weight:700; color:var(--coral); min-width:32px; }
+  .selected-text { background: var(--surface); border:1.5px solid var(--stroke); border-radius:10px; padding:10px 12px; font-size:clamp(0.82rem,3vw,0.9rem); color:var(--text-ui); line-height:1.9; margin-bottom:8px; display:none; max-height:160px; overflow-y:auto; }
+  .selected-text.show { display:block; }
+  .loading { text-align:center; padding:10px; color:var(--primary); font-size:0.88rem; font-weight:700; display:none; }
+  .loading.show { display:block; }
+  .error-msg { background:#fff0f0; border:1.5px solid #ffb3b3; border-radius:10px; padding:10px 12px; color:#c00; font-size:0.82rem; margin-top:8px; display:none; white-space:pre-line; }
+  .error-msg.show { display:block; }
 
-  .btn-row { display:flex; gap:8px; margin-top:2px; }
-  .btn {
-    flex:1; padding:12px 0; border:none; border-radius:36px;
-    font-family:'Noto Sans KR',sans-serif;
-    font-size:clamp(0.9rem,3.5vw,1rem);
-    font-weight:700; cursor:pointer; transition:transform 0.12s;
+  .opt-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .opt-item { background: var(--surface); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column; gap:4px; border:1.5px solid var(--stroke); }
+  .opt-item label { font-size:clamp(0.7rem,2.5vw,0.78rem); font-weight:700; color:var(--text-sub); }
+  .opt-item select, .opt-item input[type=number] {
+    font-family:'Noto Sans KR',sans-serif; font-size:clamp(0.82rem,3vw,0.9rem);
+    border:1.5px solid var(--stroke); border-radius:8px; padding:5px 7px;
+    background:white; color:var(--text-ui); outline:none; width:100%; font-weight:700;
+    transition: border-color 0.15s;
   }
-  .btn:active { transform:scale(0.96); }
-  .btn-make  { background:linear-gradient(135deg,var(--coral),#ff6b9d); color:white; }
-  .btn-clear { background:linear-gradient(135deg,var(--sun),#fdcb6e);   color:var(--ink); }
-  .btn-print { background:linear-gradient(135deg,var(--leaf),#00b894);  color:white; }
+  .opt-item select:focus, .opt-item input[type=number]:focus { border-color: var(--primary); }
+
+  .fade-sub { grid-column:1/-1; background:rgba(91,91,214,0.05); border:1.5px dashed var(--primary-d); border-radius:10px; padding:8px 10px; display:none; gap:8px; align-items:center; flex-wrap:wrap; }
+  .fade-sub.show { display:flex; }
+  .fade-sub label { font-size:0.75rem; font-weight:700; color:var(--text-sub); white-space:nowrap; }
+  .fade-sub input[type=number] { font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; border:1.5px solid var(--stroke); border-radius:7px; padding:4px 6px; background:white; color:var(--text-ui); outline:none; width:56px; font-weight:700; }
+  .fade-sub input[type=range] { flex:1; min-width:70px; accent-color:var(--primary); }
+  .fade-val { font-size:0.78rem; font-weight:700; color:var(--primary); min-width:30px; }
+
+  .btn-row { display:flex; gap:8px; }
+  .btn { flex:1; padding:13px 0; border:none; border-radius: var(--radius-btn); font-family:'Noto Sans KR',sans-serif; font-size:clamp(0.9rem,3.5vw,1rem); font-weight:700; cursor:pointer; transition: background 0.15s, transform 0.1s, box-shadow 0.15s; letter-spacing:0.01em; }
+  .btn:active { transform:scale(0.97); }
+  .btn:disabled { opacity:0.38; cursor:not-allowed; transform:none; box-shadow:none; }
+  /* Contained - primary (말씀 불러오기) */
+  .btn-load { background: #5755ff; color: #ffffff; border: 2px solid #5755ff; box-shadow: 0 2px 8px rgba(87,85,255,0.30); }
+  .btn-load:not(:disabled):hover { background: #4543e0; border-color: #4543e0; box-shadow: 0 4px 14px rgba(87,85,255,0.40); }
+  /* Contained - dark (만들기) */
+  .btn-make { background: #1e1c93; color: #ffffff; border: 2px solid #1e1c93; box-shadow: 0 2px 8px rgba(30,28,147,0.30); }
+  .btn-make:not(:disabled):hover { background: #15138a; border-color: #15138a; box-shadow: 0 4px 14px rgba(30,28,147,0.40); }
+  /* Outlined - neutral (지우기) */
+  .btn-clear { background: white; color: var(--text-sub); border: 1.5px solid var(--stroke); box-shadow: none; }
+  .btn-clear:not(:disabled):hover { background: var(--surface); color: var(--text-ui); border-color: #bcbce8; }
+  /* Contained - success */
+  .btn-print { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.28); border: 1.5px solid #16a34a; }
+  .btn-print:not(:disabled):hover { background: #16a34a; box-shadow: 0 4px 14px rgba(34,197,94,0.36); border-color: #15803d; }
 
   .print-bar { max-width:560px; margin:0 auto; padding:0 16px 12px; display:none; }
   .print-bar.show { display:block; }
   .print-bar .btn { width:100%; display:block; }
 
-  /* ═══════════════════
-     A4 미리보기
-  ═══════════════════ */
-  .preview-scroll {
-    overflow-x: auto;
-    padding: 0 16px 48px;
-    -webkit-overflow-scrolling: touch;
-  }
+  footer { display:block !important; }
 
-  /* ── A4 시트 ──
-     핵심: width 고정 + overflow hidden 제거
-     칸들이 넘치지 않도록 내부에서만 처리
-  */
+  .preview-scroll { padding: 12px 12px 48px; }
+
+  .sheet-scaler { margin-bottom: 16px; }
+
   .sheet {
     background: white;
-    width: 210mm;
-    min-height: 297mm;
-    padding: 15mm;
-    box-shadow: 0 8px 36px rgba(0,0,0,0.13);
+    width: 100%;
+    padding: 5vw 5vw;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     border-radius: 4px;
-    margin: 0 auto 20px;
     position: relative;
+    box-sizing: border-box;
   }
 
-  .sheet::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle,#dae8f5 1px,transparent 1px);
-    background-size: 18px 18px;
-    opacity: 0.3;
-    pointer-events: none;
+  @media (min-width: 600px) {
+    .sheet { max-width: 560px; margin: 0 auto; padding: 24px; }
   }
+  .sheet::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,#c7c7f5 1px,transparent 1px); background-size:18px 18px; opacity:0.25; pointer-events:none; }
 
-  /* 헤더: 타이틀 좌 / 이름확인 우 */
-  .sheet-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2.5px dashed var(--sun);
-    padding-bottom: 3mm;
-    margin-bottom: 4mm;
-    position: relative;
-    z-index: 1;
-  }
-  .sheet-title { font-size:12pt; font-weight:900; color:var(--ocean); white-space:nowrap; }
+  .sheet-header { display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid #5755ff; padding-bottom:3mm; margin-bottom:4mm; position:relative; z-index:1; gap:4px; }
+  .sheet-title { font-size:clamp(8pt, 2.5vw, 12pt); font-weight:900; color:#1a1a3e; white-space:nowrap; }
+  .sheet-sub { font-size:clamp(6pt, 1.8vw, 8pt); color:#5755ff; font-weight:700; margin-top:1px; white-space:nowrap; }
+  .sheet-header-right { display:flex; align-items:center; gap:3mm; flex-shrink:0; }
+  .name-field { display:flex; align-items:center; gap:2mm; font-size:clamp(6pt,1.8vw,8pt); color:#888; white-space:nowrap; }
+  .name-field .uline { display:inline-block; width:14mm; border-bottom:1px solid #ccc; }
+  .sheet-page { font-size:clamp(6pt,1.8vw,7.5pt); color:#5755ff; background:white; border:1px solid #c7c7f5; border-radius:5px; padding:2px 6px; white-space:nowrap; }
 
-  .sheet-header-right {
-    display: flex;
-    align-items: center;
-    gap: 6mm;
-    flex-shrink: 0;
-  }
-  .name-field {
-    display: flex;
-    align-items: center;
-    gap: 2mm;
-    font-size: 8pt;
-    color: #666;
-    white-space: nowrap;
-  }
-  .name-field .uline {
-    display: inline-block;
-    width: 20mm;
-    border-bottom: 1.2px solid #bbb;
-  }
-  .sheet-page {
-    font-size: 7.5pt; color:#aaa;
-    background:var(--sky);
-    border:1.5px solid var(--border);
-    border-radius:5px; padding:2px 8px;
-    white-space: nowrap;
-  }
+  .verse-section { position:relative; z-index:1; margin-bottom:2mm; }
+  .verse-label { font-size:7pt; color:#5755ff; font-weight:700; margin-bottom:0.8mm; }
+  .char-row { display:flex; flex-wrap:nowrap; }
 
-  /* ── 문장 섹션 ── */
-  .notebook-section { position:relative; z-index:1; margin-bottom:2mm; }
-  .sentence-label   { font-size:7pt; color:var(--coral); font-weight:700; margin-bottom:0.8mm; }
-
-  /* 핵심: 행 컨테이너는 width 180mm 고정 + overflow hidden */
-  .char-row {
-    display: flex;
-    flex-wrap: nowrap;
-    /* 180mm = 210mm - 15mm*2 */
-    max-width: 180mm;
-    overflow: hidden;
-  }
-
-  /* 칸 크기는 JS에서 --cw, --cf 주입 */
+  /* 원본 셀 - 블루 톤 */
   .original-cell {
-    width: var(--cw);
-    height: var(--cw);
-    min-width: var(--cw);
-    flex-shrink: 0;
-    border: 2px solid var(--border);
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--cf);
-    font-weight: 900;
-    color: var(--ocean);
-    background: #eef6ff;
-    position: relative;
-    overflow: hidden;
-    line-height: 1;
-    font-family: 'Noto Sans KR', sans-serif;
+    width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0;
+    border:1px solid #9b9bf0; border-radius:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:var(--cf); font-weight:900; color:#1e1c93;
+    background:white;
+    position:relative; overflow:hidden; line-height:1; font-family:'Noto Sans KR',sans-serif;
+    word-break:keep-all; white-space:nowrap;
   }
-  .original-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:#bcd9f5; }
-  .original-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:#bcd9f5; }
+  .original-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:#9b9bf0; opacity:0.35; }
+  .original-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:#9b9bf0; opacity:0.35; }
 
+  /* 따라쓰기 셀 */
   .practice-cell {
-    width: var(--cw);
-    height: var(--cw);
-    min-width: var(--cw);
-    flex-shrink: 0;
-    border: 1.8px solid var(--grid);
-    border-radius: 2px;
-    background: white;
-    position: relative;
-    overflow: hidden;
-  }
-  .practice-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:var(--guide); opacity:.4; }
-  .practice-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:var(--guide); opacity:.4; }
-  .diag {
-    position:absolute; inset:0;
-    background:
-      linear-gradient(to bottom right,transparent calc(50% - .5px),#ffe0ec 50%,transparent calc(50% + .5px)),
-      linear-gradient(to bottom left, transparent calc(50% - .5px),#ffe0ec 50%,transparent calc(50% + .5px));
-    opacity:.18;
+    width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0;
+    border:1px solid #ddddf5; border-radius:0; background:white;
   }
 
+  /* 흐리게 셀 */
   .fade-cell {
-    width: var(--cw);
-    height: var(--cw);
-    min-width: var(--cw);
-    flex-shrink: 0;
-    border: 1.8px solid var(--grid);
-    border-radius: 2px;
-    background: white;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--cf);
-    font-weight: 900;
-    font-family: 'Noto Sans KR', sans-serif;
-    line-height: 1;
-    color: var(--ocean);
+    width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0;
+    border:1px solid #ddddf5; border-radius:0; background:white;
+    display:flex; align-items:center; justify-content:center;
+    font-size:var(--cf); font-weight:900; font-family:'Noto Sans KR',sans-serif; line-height:1; color:#1e1c93;
   }
-  .fade-cell::before { content:''; position:absolute; width:100%; height:1px; top:50%; background:var(--guide); opacity:.4; }
-  .fade-cell::after  { content:''; position:absolute; width:1px; height:100%; left:50%; background:var(--guide); opacity:.4; }
 
-  .space-cell { width:calc(var(--cw) * 0.35); min-width:calc(var(--cw) * 0.35); flex-shrink:0; }
-
+  /* 띄어쓰기 정칸 */
+  .space-cell {
+    width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0;
+    border:1px solid #ddddf5; border-radius:0; background:white;
+  }
+  .space-original {
+    width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0;
+    border:1px solid #9b9bf0; border-radius:0; background:white;
+  }
   .practice-rows { display:flex; flex-direction:column; }
-  .row-divider   { height:1.5mm; margin:1.5mm 0; border-bottom:1.2px dotted #ddd; }
+  .row-divider { height:1.5mm; margin:1.5mm 0; border-bottom:1px dashed #c7c7f5; }
 
-  /* ═══════════════════
-     인쇄
-  ═══════════════════ */
   @media print {
     @page { size:A4; margin:0; }
     * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    body { background:none !important; }
-    .ui-wrap, .print-bar { display:none !important; }
-    .preview-scroll { padding:0; overflow:visible; }
+    html, body { background:none !important; margin:0; padding:0; }
+    .ui-wrap, .print-bar, footer { display:none !important; }
+    .preview-scroll { padding:0 !important; overflow:visible; background:none !important; }
+    .sheet-scaler { margin:0 !important; padding:0 !important; background:none !important; }
     .sheet {
-      box-shadow:none; border-radius:0; margin:0;
-      width:210mm; min-height:297mm;
-      page-break-after:always;
-      padding:15mm;
+      box-shadow:none !important; border-radius:0 !important;
+      margin:0 !important; width:210mm !important;
+      min-height:297mm !important; padding:15mm !important;
+      page-break-after: always;
     }
-    .sheet::before { opacity:.15; }
   }
 </style>
 </head>
 <body>
+<script>
+  (function(){
+    const ua = navigator.userAgent;
+    // 정확한 인앱 감지 (사파리/크롬은 제외)
+    const isKakao = /KAKAOTALK/i.test(ua);
+    const isInsta = /Instagram/i.test(ua);
+    const isFB    = /FBAN|FBAV/i.test(ua);
+    const isLine  = /Line\//i.test(ua);
+    const isInApp = isKakao || isInsta || isFB || isLine;
+    if(!isInApp) return;
 
+    const url = location.href;
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    const isAndroid = /Android/i.test(ua);
+
+    // 전체 화면 오버레이
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#74b8d8 0%,#a8d4e8 35%,#d0eaf5 65%,#e8f4fa 100%);';
+    overlay.innerHTML = `
+      <div style="background:white;border-radius:20px;padding:36px 28px;max-width:300px;width:85%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+        <div style="font-size:2.5rem">✝️</div>
+        <h2 style="font-size:1.1rem;font-weight:900;color:#1a1a3e;margin:12px 0 8px;">외부 브라우저로 열어주세요</h2>
+        <p style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:20px;">인쇄 기능을 사용하려면<br>외부 브라우저가 필요해요</p>
+        ${isIOS ? `<button onclick="location.href='safari-'+location.href" style="display:block;width:100%;padding:13px;border-radius:12px;font-size:0.95rem;font-weight:700;border:none;background:#5755ff;color:white;margin-bottom:10px;box-sizing:border-box;">🧭 Safari로 열기</button>` : ''}
+        ${isAndroid ? `<button onclick="location.href='intent:'+location.href+'#Intent;scheme=https;package=com.android.chrome;end'" style="display:block;width:100%;padding:13px;border-radius:12px;font-size:0.95rem;font-weight:700;border:none;background:#5755ff;color:white;margin-bottom:10px;box-sizing:border-box;">🌐 크롬으로 열기</button>` : ''}
+        <button onclick="if(navigator.clipboard){navigator.clipboard.writeText(location.href).then(function(){alert('주소가 복사됐어요!\\n브라우저에 붙여넣기 해주세요 😊')});}else{prompt('주소를 복사하세요',location.href);}" style="display:block;width:100%;padding:13px;border-radius:12px;font-size:0.95rem;font-weight:700;border:none;background:white;color:#5755ff;margin-bottom:16px;box-sizing:border-box;">🔗 주소 복사하기</button>
+        <p style="font-size:0.72rem;color:#999;line-height:1.7;text-align:left;">
+          📌 카카오톡: 우측 하단 ··· → 다른 브라우저로 열기<br>
+          📌 인스타그램: 우측 하단 ··· → 브라우저에서 열기
+        </p>
+      </div>`;
+
+    // 즉시 또는 body 생성 후 추가
+    function appendOverlay(){
+      if(document.body) document.body.appendChild(overlay);
+      else document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(overlay); });
+    }
+    appendOverlay();
+  })();
+</script>
 <div class="ui-wrap">
-  <h1>한글 연습장</h1>
-  <p class="subtitle">문장을 입력하고 만들기를 눌러요 ✏️</p>
-
-  <div class="panel">
-    <div class="panel-title">연습할 문장 (줄바꿈으로 문장 구분)</div>
-    <textarea id="inputText"
-      placeholder="예) 나는 학교에 갑니다.&#10;오늘 날씨가 맑아요.&#10;사랑해요 엄마!"></textarea>
+  <div class="app-title">
+    <div class="cross">✝️</div>
+    <h1>손으로 쓰는 성경</h1>
+    <p>말씀을 손으로 새기며 묵상해요</p>
   </div>
 
   <div class="panel">
-    <div class="panel-title">출력 설정</div>
-    <div class="opt-grid">
-
-      <div class="opt-item">
-        <label>칸 수 (4~12)</label>
-        <input type="number" id="colCount" value="12" min="4" max="12">
-      </div>
-
-      <div class="opt-item">
-        <label>이름 칸</label>
-        <select id="showName">
-          <option value="yes">보이기</option>
-          <option value="no">숨기기</option>
+    <div class="panel-title">📖 말씀 선택 (개역한글)</div>
+    <div class="sel-row">
+      <div class="sel-wrap">
+        <div class="sel-label">성경</div>
+        <select id="bookSelect" onchange="onBookChange()">
+          <option value="">권 선택</option>
         </select>
       </div>
+      <div class="sel-wrap">
+        <div class="sel-label">장</div>
+        <select id="chapterSelect" onchange="onChapterChange()" disabled>
+          <option value="">장 선택</option>
+        </select>
+      </div>
+    </div>
+    <div class="verse-row">
+      <div class="sel-wrap">
+        <div class="sel-label">시작 절</div>
+        <input class="verse-input" type="number" id="verseFrom" placeholder="1" min="1" disabled>
+      </div>
+      <div class="dash">~</div>
+      <div class="sel-wrap">
+        <div class="sel-label">끝 절</div>
+        <input class="verse-input" type="number" id="verseTo" placeholder="끝" min="1" disabled>
+      </div>
+    </div>
+    <div class="loading" id="loadingMsg">⏳ 말씀을 불러오는 중...</div>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="selected-text" id="selectedText"></div>
+    <div class="btn-row">
+      <button class="btn btn-load" id="loadBtn" onclick="loadVerses()" disabled>말씀 불러오기</button>
+    </div>
+  </div>
 
+  <div class="panel">
+    <div class="panel-title">🗒️ 출력 설정</div>
+    <div class="opt-grid">
+      <div class="opt-item">
+        <label>칸 수 (15~30)</label>
+        <input type="number" id="colCount" value="20" min="15" max="30">
+      </div>
+      <div class="opt-item">
+        <label>이름 칸</label>
+        <select id="showName"><option value="yes">보이기</option><option value="no">숨기기</option></select>
+      </div>
       <div class="opt-item">
         <label>따라쓰기 줄 수</label>
         <input type="number" id="practiceRows" value="2" min="0" max="5">
       </div>
-
       <div class="opt-item">
         <label>흐리게 따라쓰기</label>
-        <select id="fadeMode" onchange="toggleFadeSub()">
-          <option value="0">사용 안 함</option>
-          <option value="1">사용</option>
-        </select>
+        <select id="fadeMode" onchange="toggleFadeSub()"><option value="0">사용 안 함</option><option value="1">사용</option></select>
       </div>
-
       <div class="fade-sub" id="fadeSub">
         <label>줄 수</label>
         <input type="number" id="fadeRows" value="1" min="1" max="5">
         <label style="margin-left:6px">진하기</label>
-        <input type="range" id="fadeOpacity" min="5" max="40" value="18"
-          oninput="document.getElementById('fadeVal').textContent=this.value+'%'">
+        <input type="range" id="fadeOpacity" min="5" max="40" value="18" oninput="document.getElementById('fadeVal').textContent=this.value+'%'">
         <span class="fade-val" id="fadeVal">18%</span>
       </div>
-
     </div>
     <div class="btn-row">
       <button class="btn btn-clear" onclick="clearAll()">지우기</button>
-      <button class="btn btn-make"  onclick="generate()">만들기</button>
+      <button class="btn btn-make" id="makeBtn" onclick="generate()" disabled>만들기</button>
     </div>
   </div>
 </div>
 
 <div class="print-bar" id="printBar">
-  <button class="btn btn-print" onclick="window.print()">🖨 A4 인쇄하기</button>
+  <button class="btn btn-print" onclick="doPrint()">🖨 인쇄 / PDF 저장</button>
 </div>
-
-<div class="preview-scroll">
+<div class="preview-scroll" id="previewScroll">
   <div id="sheetContainer"></div>
 </div>
 
 <script>
-  const ORDINALS = ['첫번째','두번째','세번째','네번째','다섯번째',
-                    '여섯번째','일곱번째','여덟번째','아홉번째','열번째',
-                    '열한번째','열두번째','열세번째','열네번째','열다섯번째'];
-  function ordinal(n){ return ORDINALS[n] || (n+1)+'번째'; }
+  // getbible.net v2 API - 개역한글 (퍼블릭 도메인)
+  // https://api.getbible.net/v2/korean/{book_number}/{chapter_number}.json
+  // book_number: 1=창세기 ~ 66=요한계시록
+  // chapter_number: 1부터 시작
+  // 응답: { book_nr, chapter, name, verses: {1:{verse:1,text:'...'}, ...} }
+
+  const API = 'https://api.getbible.net/v2/korean';
+
+  const BOOKS = [
+    {name:'창세기',chapters:50},{name:'출애굽기',chapters:40},{name:'레위기',chapters:27},
+    {name:'민수기',chapters:36},{name:'신명기',chapters:34},{name:'여호수아',chapters:24},
+    {name:'사사기',chapters:21},{name:'룻기',chapters:4},{name:'사무엘상',chapters:31},
+    {name:'사무엘하',chapters:24},{name:'열왕기상',chapters:22},{name:'열왕기하',chapters:25},
+    {name:'역대상',chapters:29},{name:'역대하',chapters:36},{name:'에스라',chapters:10},
+    {name:'느헤미야',chapters:13},{name:'에스더',chapters:10},{name:'욥기',chapters:42},
+    {name:'시편',chapters:150},{name:'잠언',chapters:31},{name:'전도서',chapters:12},
+    {name:'아가',chapters:8},{name:'이사야',chapters:66},{name:'예레미야',chapters:52},
+    {name:'예레미야애가',chapters:5},{name:'에스겔',chapters:48},{name:'다니엘',chapters:12},
+    {name:'호세아',chapters:14},{name:'요엘',chapters:3},{name:'아모스',chapters:9},
+    {name:'오바댜',chapters:1},{name:'요나',chapters:4},{name:'미가',chapters:7},
+    {name:'나훔',chapters:3},{name:'하박국',chapters:3},{name:'스바냐',chapters:3},
+    {name:'학개',chapters:2},{name:'스가랴',chapters:14},{name:'말라기',chapters:4},
+    {name:'마태복음',chapters:28},{name:'마가복음',chapters:16},{name:'누가복음',chapters:24},
+    {name:'요한복음',chapters:21},{name:'사도행전',chapters:28},{name:'로마서',chapters:16},
+    {name:'고린도전서',chapters:16},{name:'고린도후서',chapters:13},{name:'갈라디아서',chapters:6},
+    {name:'에베소서',chapters:6},{name:'빌립보서',chapters:4},{name:'골로새서',chapters:4},
+    {name:'데살로니가전서',chapters:5},{name:'데살로니가후서',chapters:3},{name:'디모데전서',chapters:6},
+    {name:'디모데후서',chapters:4},{name:'디도서',chapters:3},{name:'빌레몬서',chapters:1},
+    {name:'히브리서',chapters:13},{name:'야고보서',chapters:5},{name:'베드로전서',chapters:5},
+    {name:'베드로후서',chapters:3},{name:'요한1서',chapters:5},{name:'요한2서',chapters:1},
+    {name:'요한3서',chapters:1},{name:'유다서',chapters:1},{name:'요한계시록',chapters:22}
+  ];
+
+  const cache = {};
+  let currentVerses = [];
 
   function toggleFadeSub(){
-    const v = document.getElementById('fadeMode').value;
-    document.getElementById('fadeSub').classList.toggle('show', v==='1');
+    document.getElementById('fadeSub').classList.toggle('show', document.getElementById('fadeMode').value==='1');
   }
 
+  function initBooks(){
+    const sel = document.getElementById('bookSelect');
+    BOOKS.forEach((b,i)=>{
+      const opt = document.createElement('option');
+      opt.value = i+1; // 1-indexed (book number)
+      opt.textContent = b.name;
+      sel.appendChild(opt);
+    });
+  }
+
+  function onBookChange(){
+    const bookNum = parseInt(document.getElementById('bookSelect').value);
+    const chSel = document.getElementById('chapterSelect');
+    chSel.innerHTML = '<option value="">장 선택</option>';
+    chSel.disabled = true;
+    resetVerseInputs();
+    if(!bookNum) return;
+    const book = BOOKS[bookNum-1];
+    for(let i=1; i<=book.chapters; i++){
+      const opt = document.createElement('option');
+      opt.value = i; opt.textContent = i+'장';
+      chSel.appendChild(opt);
+    }
+    chSel.disabled = false;
+  }
+
+  function onChapterChange(){
+    const ch = document.getElementById('chapterSelect').value;
+    resetVerseInputs();
+    if(ch){
+      document.getElementById('verseFrom').disabled = false;
+      document.getElementById('verseTo').disabled = false;
+      document.getElementById('loadBtn').disabled = false;
+      document.getElementById('verseFrom').value = 1;
+      document.getElementById('verseTo').value = '';
+    }
+  }
+
+  function resetVerseInputs(){
+    document.getElementById('verseFrom').disabled = true;
+    document.getElementById('verseTo').disabled = true;
+    document.getElementById('loadBtn').disabled = true;
+    document.getElementById('selectedText').classList.remove('show');
+    document.getElementById('makeBtn').disabled = true;
+    currentVerses = []; hideError();
+  }
+
+  function showError(msg){ const e=document.getElementById('errorMsg'); e.textContent=msg; e.classList.add('show'); }
+  function hideError(){ document.getElementById('errorMsg').classList.remove('show'); }
+
+  async function loadVerses(){
+    const bookNum = parseInt(document.getElementById('bookSelect').value);
+    const chapter = parseInt(document.getElementById('chapterSelect').value);
+    if(!bookNum || !chapter){ showError('성경과 장을 선택해주세요.'); return; }
+
+    const from = parseInt(document.getElementById('verseFrom').value)||1;
+    const toVal = document.getElementById('verseTo').value;
+
+    hideError();
+    document.getElementById('loadingMsg').classList.add('show');
+    document.getElementById('loadBtn').disabled = true;
+    document.getElementById('selectedText').classList.remove('show');
+    document.getElementById('makeBtn').disabled = true;
+    currentVerses = [];
+
+    const cacheKey = bookNum+'-'+chapter;
+    try {
+      if(!cache[cacheKey]){
+        const url = `${API}/${bookNum}/${chapter}.json`;
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        cache[cacheKey] = await res.json();
+      }
+
+      const data = cache[cacheKey];
+      // 응답: { verses: { "1": {verse:1, text:"..."}, "2": {...}, ... } }
+      const versesObj = data.verses;
+      const allNums = Object.keys(versesObj).map(Number).sort((a,b)=>a-b);
+      const to = toVal ? parseInt(toVal) : Math.max(...allNums);
+
+      currentVerses = allNums
+        .filter(n => n>=from && n<=to)
+        .map(n => ({
+          number: n,
+          text: (versesObj[n].text || '').replace(/\s+/g,' ').trim()
+        }))
+        .filter(v => v.text.length > 0);
+
+      if(!currentVerses.length){ showError('해당 절이 없어요. 범위를 확인해주세요.'); return; }
+
+      const textEl = document.getElementById('selectedText');
+      textEl.innerHTML = currentVerses.map(v=>
+        `<span style="color:#5755ff;font-weight:900;margin-right:4px">${v.number}절</span>${v.text}`
+      ).join('<br><br>');
+      textEl.classList.add('show');
+      document.getElementById('makeBtn').disabled = false;
+
+    } catch(e){
+      console.error(e);
+      showError('말씀을 불러오지 못했어요 😢\n('+e.message+')\n잠시 후 다시 시도해주세요.');
+    } finally {
+      document.getElementById('loadingMsg').classList.remove('show');
+      document.getElementById('loadBtn').disabled = false;
+    }
+  }
+
+  // 마지막 생성 옵션 저장 (인쇄 시 재사용)
+  let lastGenOptions = null;
+  let lastSections   = null;
+
   function clearAll(){
-    document.getElementById('inputText').value = '';
-    document.getElementById('sheetContainer').innerHTML = '';
+    document.getElementById('sheetContainer').innerHTML='';
     document.getElementById('printBar').classList.remove('show');
+    document.getElementById('selectedText').classList.remove('show');
+    document.getElementById('makeBtn').disabled=true;
+    currentVerses=[]; hideError();
   }
 
   function generate(){
-    const raw = document.getElementById('inputText').value.trim();
-    if(!raw){ alert('문장을 입력해 주세요!'); return; }
-
-    const cols        = Math.min(12, Math.max(4, parseInt(document.getElementById('colCount').value)||8));
-    const showName    = document.getElementById('showName').value === 'yes';
-    const practiceN   = Math.max(0, parseInt(document.getElementById('practiceRows').value)||0);
-    const fadeOn      = document.getElementById('fadeMode').value === '1';
-    const fadeN       = fadeOn ? Math.max(1, parseInt(document.getElementById('fadeRows').value)||1) : 0;
+    if(!currentVerses.length){ alert('먼저 말씀을 불러오세요!'); return; }
+    const cols        = Math.min(30,Math.max(15,parseInt(document.getElementById('colCount').value)||20));
+    const showName    = document.getElementById('showName').value==='yes';
+    const practiceN   = Math.max(0,parseInt(document.getElementById('practiceRows').value)||0);
+    const fadeOn      = document.getElementById('fadeMode').value==='1';
+    const fadeN       = fadeOn?Math.max(1,parseInt(document.getElementById('fadeRows').value)||1):0;
     const fadeOpacity = parseInt(document.getElementById('fadeOpacity').value)||18;
 
-    const sentences = raw.split(/\n/).map(s=>s.trim()).filter(s=>s.length>0);
+    const container = document.getElementById('sheetContainer');
+    container.innerHTML='';
 
-    // 칸수 초과 문장 체크 (공백 제외 글자 수 기준)
-    const overList = sentences
-      .map((s, i) => ({ idx: i+1, len: Array.from(s).filter(c=>c!==' ').length, text: s }))
-      .filter(s => s.len > cols);
+    // 실제 스크롤 영역 너비로 계산
+    const scrollEl = document.getElementById('previewScroll');
+    const scrollW  = scrollEl.clientWidth;
+    const isPC     = scrollW >= 600;
+    // PC: sheet max-width 560, padding 24px*2 / 모바일: 100% - padding 12px*2 - sheet 5vw*2
+    const sheetW   = isPC ? 560 : scrollW - 24;
+    const padPx    = isPC ? 24 : Math.floor(sheetW * 0.05);
+    const usableW  = sheetW - padPx * 2;
+    const cellPx   = Math.floor(usableW / cols);
+    const fontPx   = Math.floor(cellPx * 0.62);
 
-    if(overList.length > 0){
-      const msg = overList.map(s =>
-        `• ${ordinal(s.idx-1)} 문장: ${s.len}글자 (최대 ${cols}칸)`
-      ).join('\n');
-      alert(`⚠️ 칸 수(${cols}칸)를 초과한 문장이 있어요!\n\n${msg}\n\n칸 수를 늘리거나 문장을 줄여주세요.`);
-      return;
+    // 인쇄용 mm도 병행 계산
+    const cellMm  = parseFloat((180/cols).toFixed(4));
+    const fontMm  = parseFloat((cellMm*0.62).toFixed(4));
+
+    // 공백도 1칸으로 계산해서 cols 단위로 줄 분할 (원고지 방식)
+    function splitLines(text, maxCols){
+      const chars = Array.from(text);
+      const lines = [];
+      let line = [];
+      let count = 0;
+      for(let i=0; i<chars.length; i++){
+        const ch = chars[i];
+        if(count >= maxCols){
+          lines.push(line);
+          line = []; count = 0;
+        }
+        line.push(ch);
+        count++;
+      }
+      if(line.length) lines.push(line);
+      return lines;
     }
 
-    const container = document.getElementById('sheetContainer');
-    container.innerHTML = '';
-
-    // 칸 크기: 180mm / cols (소수점 4자리)
-    const cellMm = parseFloat((180 / cols).toFixed(4));
-    const fontMm = parseFloat((cellMm * 0.78).toFixed(4));
-
-    // 페이지당 최대 문장 수 계산
-    // 사용 가능 높이: 297 - 30(마진) - 14(헤더) = 253mm
-    const usableH  = 253;
-    // 섹션 높이: 원본1 + 따라쓰기N + 흐리게N + 라벨2.5mm + 구분3mm
-    const sectionH = cellMm * (1 + practiceN + fadeN) + 2.5 + 3;
-    const maxPer   = Math.max(1, Math.floor(usableH / sectionH));
-
-    const pages = [];
-    for(let i=0; i<sentences.length; i+=maxPer)
-      pages.push(sentences.slice(i, i+maxPer));
-
-    pages.forEach((ps, pIdx)=>{
-      container.appendChild(
-        buildSheet(ps, cols, cellMm, fontMm, practiceN, fadeN, fadeOpacity,
-                   showName, pIdx+1, pages.length, pIdx*maxPer)
-      );
+    // 절을 줄 단위 섹션으로 변환
+    // 각 섹션: { verseNum, lineNum, totalLines, chars }
+    const sections = [];
+    currentVerses.forEach(verse=>{
+      const lines = splitLines(verse.text, cols);
+      lines.forEach((chars, li)=>{
+        sections.push({ verseNum: verse.number, lineNum: li+1, totalLines: lines.length, chars });
+      });
     });
 
+
+    // 실제 섹션 높이를 DOM에서 측정해서 maxPer 계산
+    const testSection = buildSection(sections[0], cols, cellPx, fontPx, practiceN, fadeN, fadeOpacity);
+    testSection.style.visibility = 'hidden';
+    testSection.style.position = 'absolute';
+    document.body.appendChild(testSection);
+    const sectionHpx = testSection.offsetHeight;
+    document.body.removeChild(testSection);
+
+    // px → mm 변환 (96dpi 기준)
+    const px2mm = 25.4 / 96;
+    const sectionHmm = sectionHpx * px2mm;
+    // 사용 가능 높이: 297 - 15*2(여백) - 18mm(헤더) = 249mm
+    const maxPer = Math.max(1, Math.floor(249 / sectionHmm));
+
+    const bookNum=parseInt(document.getElementById('bookSelect').value);
+    const chapter=document.getElementById('chapterSelect').value;
+    const subTitle=BOOKS[bookNum-1].name+' '+chapter+'장';
+
+    // 인쇄용으로 옵션/섹션 저장
+    lastSections   = sections;
+    lastGenOptions = { cols, showName, practiceN, fadeN, fadeOpacity, subTitle };
+
+    const pages=[];
+    for(let i=0;i<sections.length;i+=maxPer) pages.push(sections.slice(i,i+maxPer));
+    pages.forEach((ps,pIdx)=>{
+      const scaler = document.createElement('div');
+      scaler.className = 'sheet-scaler';
+      scaler.appendChild(
+        buildSheet(ps,cols,cellPx,fontPx,cellMm,fontMm,practiceN,fadeN,fadeOpacity,showName,pIdx+1,pages.length,subTitle)
+      );
+      container.appendChild(scaler);
+    });
     document.getElementById('printBar').classList.add('show');
-    container.scrollIntoView({behavior:'smooth', block:'start'});
+    container.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
-  function buildSheet(sentences, cols, cellMm, fontMm, practiceN, fadeN, fadeOpacity,
-                      showName, pageNum, total, startIdx){
-    const sheet = document.createElement('div');
-    sheet.className = 'sheet';
-    sheet.style.setProperty('--cw', cellMm+'mm');
-    sheet.style.setProperty('--cf', fontMm+'mm');
+  function buildSection(sec, cols, cellPx, fontPx, practiceN, fadeN, fadeOpacity){
+    const { verseNum, lineNum, totalLines, chars } = sec;
+    const section = document.createElement('div'); section.className='verse-section';
+    section.style.setProperty('--cw', cellPx+'px');
+    section.style.setProperty('--cf', fontPx+'px');
+    const lbl = document.createElement('div'); lbl.className='verse-label';
+    lbl.textContent = totalLines > 1 ? `${verseNum}절 (${lineNum}/${totalLines})` : `${verseNum}절`;
+    section.appendChild(lbl);
+    section.appendChild(buildRow(chars,'original',null,cols));
+    const pw = document.createElement('div'); pw.className='practice-rows';
+    for(let r=0;r<fadeN;r++) pw.appendChild(buildRow(chars,'fade',fadeOpacity,cols));
+    for(let r=0;r<practiceN;r++) pw.appendChild(buildRow(chars,'practice',null,cols));
+    section.appendChild(pw);
+    const div = document.createElement('div'); div.className='row-divider';
+    section.appendChild(div);
+    return section;
+  }
 
-    // 헤더 (타이틀 + 이름/확인 + 페이지)
-    const hdr = document.createElement('div');
-    hdr.className = 'sheet-header';
+  function buildSheet(sections,cols,cellPx,fontPx,cellMm,fontMm,practiceN,fadeN,fadeOpacity,showName,pageNum,total,subTitle){
+    const sheet=document.createElement('div'); sheet.className='sheet';
+    // 화면: px, 인쇄: mm (CSS @media print에서 mm 변수 사용)
+    sheet.style.setProperty('--cw', cellPx+'px');
+    sheet.style.setProperty('--cf', fontPx+'px');
+    sheet.style.setProperty('--cw-print', cellMm+'mm');
+    sheet.style.setProperty('--cf-print', fontMm+'mm');
+    const hdr=document.createElement('div'); hdr.className='sheet-header';
+    const tw=document.createElement('div');
+    tw.innerHTML=`<div class="sheet-title">✝ 손으로 쓰는 성경</div><div class="sheet-sub">${subTitle}</div>`;
+    hdr.appendChild(tw);
+    const right=document.createElement('div'); right.className='sheet-header-right';
+    if(showName) right.innerHTML='<div class="name-field">이름 <span class="uline"></span></div>';
+    if(total>1){ const pg=document.createElement('div'); pg.className='sheet-page'; pg.textContent=pageNum+' / '+total; right.appendChild(pg); }
+    hdr.appendChild(right); sheet.appendChild(hdr);
 
-    const titleEl = document.createElement('div');
-    titleEl.className = 'sheet-title';
-    titleEl.textContent = '한글 연습장';
-    hdr.appendChild(titleEl);
-
-    const rightEl = document.createElement('div');
-    rightEl.className = 'sheet-header-right';
-
-    if(showName){
-      rightEl.innerHTML =
-        '<div class="name-field">이름 <span class="uline"></span></div>'
-        + '<div class="name-field">확인 <span class="uline"></span></div>';
-    }
-    if(total > 1){
-      const pg = document.createElement('div');
-      pg.className = 'sheet-page';
-      pg.textContent = pageNum + ' / ' + total;
-      rightEl.appendChild(pg);
-    }
-    hdr.appendChild(rightEl);
-    sheet.appendChild(hdr);
-
-    // 문장 섹션
-    sentences.forEach((sentence, sIdx)=>{
-      const chars   = Array.from(sentence);
-      const section = document.createElement('div');
-      section.className = 'notebook-section';
-
-      const lbl = document.createElement('div');
-      lbl.className = 'sentence-label';
-      lbl.textContent = ordinal(startIdx + sIdx) + ' 문장';
-      section.appendChild(lbl);
-
-      // 순서: 원본 → 흐리게(있으면 2번째) → 따라쓰기
-      section.appendChild(buildRow(chars, 'original', null));
-
-      const pw = document.createElement('div');
-      pw.className = 'practice-rows';
-
-      // 흐리게를 먼저(두번째 줄)
-      for(let r=0; r<fadeN; r++)
-        pw.appendChild(buildRow(chars, 'fade', fadeOpacity));
-
-      // 그 다음 빈 따라쓰기
-      for(let r=0; r<practiceN; r++)
-        pw.appendChild(buildRow(chars, 'practice', null));
-
-      section.appendChild(pw);
-
-      const divider = document.createElement('div');
-      divider.className = 'row-divider';
-      section.appendChild(divider);
-
-      sheet.appendChild(section);
+    sections.forEach(sec=>{
+      sheet.appendChild(buildSection(sec, cols, cellPx, fontPx, practiceN, fadeN, fadeOpacity));
     });
-
     return sheet;
   }
 
-  function buildRow(chars, type, fadeOpacity){
-    const row = document.createElement('div');
-    row.className = 'char-row';
-
+  function buildRow(chars, type, fadeOpacity, cols){
+    const row=document.createElement('div'); row.className='char-row';
     chars.forEach(ch=>{
-      const cell = document.createElement('div');
-      if(ch === ' '){
-        cell.className = 'space-cell';
-      } else if(type === 'original'){
-        cell.className = 'original-cell';
-        cell.textContent = ch;
-      } else if(type === 'practice'){
-        cell.className = 'practice-cell';
-        const d = document.createElement('div');
-        d.className = 'diag';
-        cell.appendChild(d);
-      } else if(type === 'fade'){
-        cell.className = 'fade-cell';
-        cell.textContent = ch;
-        cell.style.opacity = (fadeOpacity / 100).toFixed(2);
-        const d = document.createElement('div');
-        d.className = 'diag';
-        cell.appendChild(d);
+      const cell=document.createElement('div');
+      if(ch===' '){
+        if(type==='original') cell.className='space-original';
+        else cell.className='space-cell';
+      } else if(type==='original'){
+        cell.className='original-cell'; cell.textContent=ch;
+      } else if(type==='practice'){
+        cell.className='practice-cell'
+      } else if(type==='fade'){
+        cell.className='fade-cell'; cell.textContent=ch; cell.style.opacity=(fadeOpacity/100).toFixed(2);
       }
       row.appendChild(cell);
     });
-
+    // 나머지 칸을 빈 practice-cell로 채워서 항상 cols 수만큼 꽉 채움
+    for(let i=chars.length; i<cols; i++){
+      const cell=document.createElement('div');
+      if(type==='original') cell.className='space-original';
+      else { cell.className='practice-cell' }
+      row.appendChild(cell);
+    }
     return row;
   }
 
-  window.addEventListener('DOMContentLoaded', ()=>{
-    document.getElementById('inputText').value =
-      '나는 학교에 갑니다.\n오늘 날씨가 참 맑아요.\n사랑해요 엄마 아빠!';
-  });
+
+  function doPrint(){
+    const ua = navigator.userAgent;
+    const isInApp = /FBAN|FBAV|Instagram|Line|KAKAOTALK|Snapchat/i.test(ua);
+    if(isInApp){
+      alert('📌 인쇄하려면 외부 브라우저로 열어주세요!\n\n우측 하단 ⋯ 메뉴 → "다른 브라우저로 열기" 또는 "Safari로 열기" 선택 후 인쇄해주세요.');
+      return;
+    }
+    if(!lastSections || !lastGenOptions){ alert('먼저 말씀을 불러오고 만들기를 눌러주세요!'); return; }
+
+    const { cols, showName, practiceN, fadeN, fadeOpacity, subTitle } = lastGenOptions;
+    const cellMm = 180 / cols;
+    // 섹션 높이를 실제 DOM에서 측정
+    const mmToPx = 96 / 25.4;
+    const cellPxPrint = cellMm * mmToPx;
+    const fontPxPrint = cellPxPrint * 0.72;
+    const testSec = buildSection(lastSections[0], cols, cellPxPrint, fontPxPrint, practiceN, fadeN, fadeOpacity);
+    testSec.style.cssText = 'visibility:hidden;position:absolute;top:-9999px;';
+    document.body.appendChild(testSec);
+    const sectionHpx = testSec.offsetHeight;
+    document.body.removeChild(testSec);
+    const sectionHmm = sectionHpx / mmToPx;
+    const maxPer = Math.max(1, Math.floor(249 / sectionHmm));
+
+    // 인쇄용 시트 HTML 생성
+    function makePrintCellHTML(ch, type, opacity, cols){
+      const emptyCount = cols; // 나중에 패딩용
+      if(type === 'original'){
+        if(ch === ' ') return `<div class="space-original"></div>`;
+        return `<div class="original-cell">${ch}</div>`;
+      } else if(type === 'practice'){
+        if(ch === ' ') return `<div class="space-cell"></div>`;
+        return `<div class="practice-cell"></div>`;
+      } else if(type === 'fade'){
+        if(ch === ' ') return `<div class="space-cell"></div>`;
+        return `<div class="fade-cell" style="opacity:${(opacity/100).toFixed(2)}">${ch}</div>`;
+      }
+      return '';
+    }
+
+    function makeRowHTML(chars, type, opacity, cols){
+      let html = '<div class="char-row">';
+      chars.forEach(ch => { html += makePrintCellHTML(ch, type, opacity, cols); });
+      for(let i = chars.length; i < cols; i++){
+        if(type === 'original') html += `<div class="space-original"></div>`;
+        else html += `<div class="practice-cell"></div>`;
+      }
+      html += '</div>';
+      return html;
+    }
+
+    let sheetsHTML = '';
+    const cellMmVal = (180 / cols).toFixed(6);
+    const fontMmVal = (180 / cols * 0.72).toFixed(6);
+
+    // 헤더 (1개만, 첫 페이지)
+    const nameHTML = showName ? `<div style="display:flex;align-items:center;gap:2mm;font-size:8pt;color:#888;white-space:nowrap;">이름 <span style="display:inline-block;width:22mm;border-bottom:1px solid #ccc;"></span></div>` : '';
+    sheetsHTML = `<div class="sheet" style="--cw:${cellMmVal}mm;--cf:${fontMmVal}mm;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #5755ff;padding-bottom:3mm;margin-bottom:4mm;gap:4px;width:100%;page-break-inside:avoid;break-inside:avoid;">
+        <div style="flex-shrink:0;">
+          <div style="font-size:12pt;font-weight:900;color:#1a1a3e;white-space:nowrap;">✝ 손으로 쓰는 성경</div>
+          <div style="font-size:8pt;color:#5755ff;font-weight:700;margin-top:1px;white-space:nowrap;">${subTitle}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4mm;flex-shrink:0;">${nameHTML}</div>
+      </div>`;
+
+    lastSections.forEach(({ verseNum, lineNum, totalLines, chars }) => {
+      const label = totalLines > 1 ? `${verseNum}절 (${lineNum}/${totalLines})` : `${verseNum}절`;
+      sheetsHTML += `<div class="verse-section"><div class="verse-label">${label}</div>`;
+      sheetsHTML += makeRowHTML(chars, 'original', null, cols);
+      sheetsHTML += '<div class="practice-rows">';
+      for(let r = 0; r < fadeN; r++) sheetsHTML += makeRowHTML(chars, 'fade', fadeOpacity, cols);
+      for(let r = 0; r < practiceN; r++) sheetsHTML += makeRowHTML(chars, 'practice', null, cols);
+      sheetsHTML += '</div><div class="row-divider"></div></div>';
+    });
+    sheetsHTML += '</div>';
+
+    const printHTML = `<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+@page { size:A4; margin:15mm; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+html, body { margin:0; padding:0; font-family:'Noto Sans KR',sans-serif; }
+.sheet { width:180mm; background:white; }
+.sheet-header { display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid #5755ff; padding-bottom:3mm; margin-bottom:4mm; gap:4px; }
+.sheet-title { font-size:12pt; font-weight:900; color:#1a1a3e; white-space:nowrap; }
+.sheet-sub { font-size:8pt; color:#5755ff; font-weight:700; margin-top:1px; }
+.sheet-header-right { display:flex; align-items:center; gap:3mm; flex-shrink:0; }
+.name-field { display:flex; align-items:center; gap:2mm; font-size:8pt; color:#888; white-space:nowrap; }
+.name-field .uline { display:inline-block; width:14mm; border-bottom:1px solid #ccc; }
+.sheet-page { font-size:7.5pt; color:#5755ff; background:white; border:1px solid #c7c7f5; border-radius:5px; padding:2px 6px; white-space:nowrap; }
+.verse-section { margin-bottom:2mm; page-break-inside:avoid; break-inside:avoid; }
+.verse-label { font-size:7pt; color:#5755ff; font-weight:700; margin-bottom:0.8mm; }
+.char-row { display:flex; flex-wrap:nowrap; width:180mm; overflow:hidden; }
+.original-cell { width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0; border:1px solid #9b9bf0; display:flex; align-items:center; justify-content:center; font-size:var(--cf); font-weight:900; color:#1e1c93; background:white; line-height:1; font-family:'Noto Sans KR',sans-serif; }
+.practice-cell { width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0; border:1px solid #ddddf5; background:white; }
+.fade-cell { width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0; border:1px solid #ddddf5; background:white; display:flex; align-items:center; justify-content:center; font-size:var(--cf); font-weight:900; font-family:'Noto Sans KR',sans-serif; line-height:1; color:#1e1c93; }
+.space-cell { width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0; border:1px solid #ddddf5; background:white; }
+.space-original { width:var(--cw); height:var(--cw); min-width:var(--cw); flex-shrink:0; border:1px solid #9b9bf0; background:white; }
+.practice-rows { display:flex; flex-direction:column; }
+.row-divider { height:1.5mm; margin:1.5mm 0; border-bottom:1px dashed #c7c7f5; }
+</style>
+</head><body>${sheetsHTML}<script>
+document.fonts.ready.then(function(){ window.print(); });
+<\/script></body></html>`;
+
+    const printWin = window.open('', '_blank');
+    if(!printWin){ alert('팝업이 차단됐어요!\n브라우저 팝업 허용 후 다시 시도해주세요.'); return; }
+    printWin.document.write(printHTML);
+    printWin.document.close();
+    printWin.focus();
+  }
+
+  window.addEventListener('DOMContentLoaded', initBooks);
 </script>
+
+<footer style="
+  display:block;
+  text-align:center; padding:20px 16px 40px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.75rem; color:rgba(30,60,90,0.6);
+  line-height:1.8;
+  position:relative; z-index:10;
+">
+  <div>본문 출처 : <a href="https://getbible.net" target="_blank" style="color:rgba(30,60,90,0.8);text-decoration:none;font-weight:700;">getbible.net</a> | 개역한글 (Public Domain)</div>
+  <div style="margin-top:2px;">© 2025 <strong style="color:rgba(30,60,90,0.8);">ycd_spring</strong>. All rights reserved.</div>
+</footer>
 </body>
 </html>
